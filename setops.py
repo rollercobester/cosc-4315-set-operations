@@ -5,52 +5,79 @@ def print_error(message):
     print('Error: {}'.format(message))
     exit(0)
 
-def parse_command(args):
+def print_help():
+    print('Call syntax: python3 setops.py "set1=[filename];set2=[filename];operation=[difference|union|intersection]"')
+    exit(0)
 
-    if len(args) != 1:
-        error_message = 'too many arguments\n' if args else 'missing argument\n'
-        error_message += '  Expected:  python3 setops.py "set1=[filename];set2=[filename];operation=[difference|union|intersection]"'
-        print_error(error_message)
-
-    kwargs = str(args[0]).split(';')
-    kwargs = list(map(lambda x: x.split('='), kwargs))
-    set1_kwarg = list(filter(lambda x: x[0] == 'set1', kwargs))
-    set2_kwarg = list(filter(lambda x: x[0] == 'set2', kwargs))
-    operation_kwarg = list(filter(lambda x: x[0] == 'operation', kwargs))
-
-    if not set1_kwarg:
-        print_error('missing keyword argument "{}"'.format('set1'))
-    elif not set2_kwarg:
-        print_error('missing keyword argument "{}"'.format('set2'))
-    elif not operation_kwarg:
-        print_error('missing keyword argument "{}"'.format('operation'))
-
-    filename1 = set1_kwarg[0][1]
-    filename2 = set2_kwarg[0][1]
-    operation = operation_kwarg[0][1]
-    valid_operations = ['difference', 'union', 'intersection']
-
-    if not exists(filename1):
-        print_error('file "{}" does not exist'.format(filename1))
-    elif not exists(filename2):
-        print_error('file "{}" does not exist'.format(filename2))
-    elif operation not in valid_operations:
-        print_error('file: invalid operation')
-        print_error('  Valid operations: {}'.format(valid_operations))
+def parse_command(args, valid_keys, predicates):
     
-    return filename1, filename2, operation
+    def validate_argument():
+        if len(args) == 1: return next(iter(args))
+        error_message  = 'too many arguments\n' if args else 'missing argument\n'
+        return print_error(error_message)
 
-def parse_text(file):
+    def parse_arg(arg):
+        if arg in ('-h', '-help', '--h', '--help'): return print_help()
+        kwargs = map(lambda x: x.split('='), arg.replace(' ', '').split(';'))
+        kwargs = filter(lambda x: next(iter(x)) in valid_keys, kwargs)
+        return zip(*kwargs)
+
+    def validate_keys(keys):
+        missing_key = next(filter(lambda x: x not in keys, valid_keys), None) 
+        if not missing_key: return keys
+        print_error('missing keyword argument \'{}\''.format(missing_key))
+
+    def validate_values(values):
+
+        def parse_assertion(assertion):
+            iterator = iter(assertion)
+            value = next(iterator)
+            predicate, error_message = next(iterator)
+            return (value, predicate, error_message)
+    
+        def invalidate(assertion):
+            value, predicate, _ = parse_assertion(assertion)
+            return not predicate(value)
+        
+        invalid = next(filter(invalidate, zip(values, predicates)), None)
+        if not invalid: return values
+
+        invalid_value, _, error_message = parse_assertion(invalid)
+        return print_error(error_message.format(invalid_value))
+        
+    arg = validate_argument()
+    keys, values = parse_arg(arg)
+    keys = validate_keys(keys)
+    values = validate_values(values)
+    return values
+
+def parse_text(filename):
+    # TODO
     words = []
     return words
 
-def perform_operation(set1, set2):
+def perform_operation(set1, set2, operation):
+    # TODO
     set3 = []
     return set3
 
+def write_to_file(new_set):
+    # TODO
+    return
+
 if __name__ == '__main__':
-    file1, file2, operation = parse_command(sys.argv[1:])
-    set1 = parse_text(file1)
-    set2 = parse_text(file2)
-    set3 = perform_operation(set1, set2)
-    print('\n'.join(set3))
+
+    args = tuple(sys.argv[1:])
+    valid_keys = ('set1', 'set2', 'operation')
+    predicates = (
+        (lambda x: exists(x),'file \'{}\' does not exist'),
+        (lambda x: exists(x), 'file \'{}\' does not exist'),
+        (lambda x: x in ('difference', 'union', 'intersection'), 'invalid operation: {}')
+    )
+
+    filename1, filename2, operation = parse_command(args, valid_keys, predicates)
+    print(filename1, filename2, operation)
+    set1 = parse_text(filename1)
+    set2 = parse_text(filename2)
+    new_set = perform_operation(set1, set2, operation)
+    write_to_file(new_set)
