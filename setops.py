@@ -25,7 +25,7 @@ def parse_command(args, valid_keys, predicates):
     def validate_keys(keys):
         missing_key = next(filter(lambda x: x not in keys, valid_keys), None) 
         if not missing_key: return keys
-        print_error('missing keyword argument \'{}\''.format(missing_key))
+        return print_error('missing keyword argument \'{}\''.format(missing_key))
 
     def validate_values(values):
 
@@ -81,3 +81,4 @@ if __name__ == '__main__':
     set2 = parse_text(filename2)
     new_set = perform_operation(set1, set2, operation)
     write_to_file(new_set)
+    exit(0)
