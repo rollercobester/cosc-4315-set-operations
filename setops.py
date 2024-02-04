@@ -19,7 +19,7 @@ def parse_command(args, valid_keys, predicates):
     def parse_arg(arg):
         if arg in ('-h', '-help', '--h', '--help'): return print_help()
         kwargs = map(lambda x: x.split('='), arg.replace(' ', '').split(';'))
-        kwargs = filter(lambda x: next(iter(x)) in valid_keys, kwargs)
+        kwargs = filter(lambda x: x[0] in valid_keys, kwargs)
         return zip(*kwargs)
 
     def validate_keys(keys):
@@ -28,21 +28,15 @@ def parse_command(args, valid_keys, predicates):
         return print_error('missing keyword argument \'{}\''.format(missing_key))
 
     def validate_values(values):
-
-        def parse_assertion(assertion):
-            iterator = iter(assertion)
-            value = next(iterator)
-            predicate, error_message = next(iterator)
-            return (value, predicate, error_message)
     
         def invalidate(assertion):
-            value, predicate, _ = parse_assertion(assertion)
+            value, (predicate, error_message) = assertion
             return not predicate(value)
         
         invalid = next(filter(invalidate, zip(values, predicates)), None)
         if not invalid: return values
 
-        invalid_value, _, error_message = parse_assertion(invalid)
+        invalid_value, (_, error_message) = invalid
         return print_error(error_message.format(invalid_value))
         
     arg = validate_argument()
