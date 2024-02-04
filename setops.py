@@ -9,8 +9,15 @@ def print_help():
     print('Call syntax: python3 setops.py "set1=[filename];set2=[filename];operation=[difference|union|intersection]"')
     exit(0)
 
-def parse_command(args, valid_keys, predicates):
+def parse_command(args):
     
+    valid_keys = ('set1', 'set2', 'operation')
+    predicates = (
+        (lambda x: exists(x),'file \'{}\' does not exist'),
+        (lambda x: exists(x), 'file \'{}\' does not exist'),
+        (lambda x: x in ('difference', 'union', 'intersection'), 'invalid operation: {}')
+    )
+
     def validate_argument():
         if len(args) == 1: return next(iter(args))
         error_message  = 'too many arguments\n' if args else 'missing argument\n'
@@ -62,14 +69,7 @@ def write_to_file(new_set):
 if __name__ == '__main__':
 
     args = tuple(sys.argv[1:])
-    valid_keys = ('set1', 'set2', 'operation')
-    predicates = (
-        (lambda x: exists(x),'file \'{}\' does not exist'),
-        (lambda x: exists(x), 'file \'{}\' does not exist'),
-        (lambda x: x in ('difference', 'union', 'intersection'), 'invalid operation: {}')
-    )
-
-    filename1, filename2, operation = parse_command(args, valid_keys, predicates)
+    filename1, filename2, operation = parse_command(args)
     print(filename1, filename2, operation)
     set1 = parse_text(filename1)
     set2 = parse_text(filename2)
