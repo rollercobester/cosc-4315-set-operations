@@ -57,6 +57,18 @@ def parse_text(filename):
     words = []
     return words
 
+def union(set1, set2):
+    set3 = []
+    return set3
+
+def intersect(set1, set2):
+    set3 = []
+    return set3
+
+def difference(set1, set2):
+    set3 = []
+    return set3
+
 def perform_operation(set1, set2, operation):
     # TODO
     set3 = []
