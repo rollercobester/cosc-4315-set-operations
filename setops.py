@@ -66,7 +66,7 @@ parse_kwargs = lambda x: list(map(lambda x_: split(x_, '='), split(x, ';')))
 # Takes a string and returns it without spaces
 strip_spaces = lambda x: replace(x, ' ', '')
 
-# Takes string argument and sends a list of kwargs in the form of "key=value" to be filtered
+# Takes a string argument containing kwargs and sends it to get parsed and filtered
 extract_kwargs = lambda x: filter_kwargs(parse_kwargs(strip_spaces(x)))
 
 # Prints error message for invalid # of args
