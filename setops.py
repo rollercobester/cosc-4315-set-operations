@@ -89,13 +89,18 @@ read_from_file = lambda x: None
 # ----------------------------------------- Set Operations -----------------------------------------
 
 # TODO
-union = lambda set1, set2: None
+
+union_helper = lambda x,y: ([x[0]] if x[0] == y[0] else [x[0]] + [y[0]]) + union(x[1:], y[1:])
+
+union = lambda x, y: y if not x else x if not y else union_helper(x,y)
 
 # TODO
 difference = lambda set1, set2: None
 
 # TODO
-intersection_helper = lambda x, y: ([x[0]] if x[0] == y[0] else []) + (intersection(x[1:], y[1:]) if x[0] == y[0] else intersection(x[1:], y) if x[0] < y[0] else intersection(x, y[1:]))
+
+intersection_helper = lambda x,y: [x[0]] + intersection(x[1:], y[1:]) if x[0] == y[0] else intersection(x[1:], y) if x[0] < y[0] else intersection(x, y[1:])
+
 intersection = lambda x, y: [] if not x or not y else intersection_helper(x, y)
 
 def perform_operations(set1, set2, operation):
@@ -106,7 +111,12 @@ def perform_operations(set1, set2, operation):
 # --------------------------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    filename1, filename2, operation = parse_command(sys.argv[1:])
-    set1 = read_from_file(filename1)
-    set2 = read_from_file(filename2)
-    perform_operation(sort(set1), sort(set2), operation)
+   # filename1, filename2, operation = parse_command(sys.argv[1:])
+   # set1 = read_from_file(filename1)
+   # set2 = read_from_file(filename2)
+   # perform_operation(sort(set1), sort(set2), operation)
+
+    set1 = ["Bird", "Cat", "Dog", "Moose", "Rabbit"]
+    set2 = ["Apple", "Bird", "Hog", "Moose", "Tree", "Virginia"]
+    # print (intersection(set1,set2))
+    print (union(set1, set2))
