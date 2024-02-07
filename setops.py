@@ -96,7 +96,11 @@ u_compare = lambda x, y: u_greater(x, y) or u_less(x, y) or u_match(x, y)
 union     = lambda x, y: x if not y else y if not x else u_compare(x, y)
 
 # TODO
-difference = lambda set1, set2: None
+d_greater  = lambda x, y: difference(x, y[1:])           if x[0] >  y[0] else []
+d_less     = lambda x, y: [x[0]] + difference(x[1:], y)  if x[0] <  y[0] else []
+d_match    = lambda x, y: difference(x[1:], y[1:])       if x[0] == y[0] else []
+d_compare  = lambda x, y: d_greater(x, y) or d_less(x, y) or d_match(x, y)
+difference = lambda x, y: x if not x or not y else d_compare(x,y)
 
 # TODO
 i_greater = lambda x, y: intersect(x, y[1:])              if x[0] >  y[0] else []
@@ -120,5 +124,5 @@ if __name__ == '__main__':
 
     set1 = ["Bird", "Cat", "Dog", "Moose", "Rabbit"]
     set2 = ["Apple", "Bird", "Hog", "Moose", "Tree", "Virginia"]
-    # print (intersection(set1,set2))
-    print (intersect(set1, set2))
+    #print (intersect(set1,set2))
+    print (difference(set1, set2))
