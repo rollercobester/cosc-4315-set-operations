@@ -89,7 +89,8 @@ read_from_file = lambda x: None
 # ----------------------------------------- Set Operations -----------------------------------------
 
 # TODO
-union = lambda set1, set2: None
+intersection_helper = lambda x, y: ([x[0]] if x[0] == y[0] else []) + (union(x[1:], y[1:]) if x[0] == y[0] else union(x[1:], y) if x[0] < y[0] else union(x, y[1:]))
+intersection = lambda x, y: [] if not x or not y else union_helper(x, y)
 
 # TODO
 difference = lambda set1, set2: None
