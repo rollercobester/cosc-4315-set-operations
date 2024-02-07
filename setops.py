@@ -89,24 +89,26 @@ read_from_file = lambda x: None
 # ----------------------------------------- Set Operations -----------------------------------------
 
 # TODO
-
-union_helper = lambda x,y: ([x[0]] if x[0] == y[0] else [x[0]] + [y[0]]) + union(x[1:], y[1:])
-
-union = lambda x, y: y if not x else x if not y else union_helper(x,y)
+u_greater = lambda x, y: [y[0]] + union(x, y[1:]) if x[0]  > y[0] else []
+u_less    = lambda x, y: [x[0]] + union(x[1:], y) if x[0]  < y[0] else []
+u_match   = lambda x, y: union(x[1:], y)          if x[0] == y[0] else []
+u_compare = lambda x, y: u_greater(x, y) or u_less(x, y) or u_match(x, y)
+union     = lambda x, y: x if not y else y if not x else u_compare(x, y)
 
 # TODO
 difference = lambda set1, set2: None
 
 # TODO
-
-intersection_helper = lambda x,y: [x[0]] + intersection(x[1:], y[1:]) if x[0] == y[0] else intersection(x[1:], y) if x[0] < y[0] else intersection(x, y[1:])
-
-intersection = lambda x, y: [] if not x or not y else intersection_helper(x, y)
+i_greater = lambda x, y: intersect(x, y[1:])              if x[0] >  y[0] else []
+i_less    = lambda x, y: intersect(x[1:], y)              if x[0] <  y[0] else []
+i_match   = lambda x, y: [x[0]] + intersect(x[1:], y[1:]) if x[0] == y[0] else []
+i_compare = lambda x, y: i_greater(x, y) or i_less(x, y) or i_match(x, y)
+intersect = lambda x, y: [] if not x or not y else i_compare(x, y)
 
 def perform_operations(set1, set2, operation):
     if operation == 'union': union(set1, set2)
     elif operation == 'difference': difference(set1, set2)
-    elif operatioin == 'intersection': intersection(set1, set2)
+    elif operation == 'intersection': intersect(set1, set2)
 
 # --------------------------------------------------------------------------------------------------
 
@@ -119,4 +121,4 @@ if __name__ == '__main__':
     set1 = ["Bird", "Cat", "Dog", "Moose", "Rabbit"]
     set2 = ["Apple", "Bird", "Hog", "Moose", "Tree", "Virginia"]
     # print (intersection(set1,set2))
-    print (union(set1, set2))
+    print (intersect(set1, set2))
