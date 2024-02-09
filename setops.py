@@ -81,7 +81,21 @@ parse_command = lambda x: parse_args(x)
 # ------------------------------------------ File Parser -------------------------------------------
 
 # TODO
-sort = lambda x: None
+
+def merge_sort(left, right):
+    
+    print(left)
+    print(right)
+    
+    sort(left)
+    sort(right)
+
+def sort(x):
+    if len(x) > 2:
+        return merge_sort(x[:len(x)//2], x[len(x)//2:])
+    return x
+
+# sort = lambda x: None
 
 # TODO
 read_from_file = lambda x: None
@@ -124,5 +138,8 @@ if __name__ == '__main__':
 
     set1 = ["Bird", "Cat", "Dog", "Moose", "Rabbit"]
     set2 = ["Apple", "Bird", "Hog", "Moose", "Tree", "Virginia"]
-    #print (intersect(set1,set2))
-    print (difference(set1, set2))
+    set3 = [9, 8, 7, 6, 5, 4, 3, 2, 1]
+    # print (intersect(set1,set2))
+    # print (difference(set1, set2))
+    count = 0
+    print(sort(set3))
