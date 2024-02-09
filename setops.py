@@ -82,16 +82,29 @@ parse_command = lambda x: parse_args(x)
 
 # TODO
 
+def bubble_sort(ar): # Credit for this algorithm --> https://devansh42.medium.com/bubble-sort-without-loops-69166b854c67
+    if len(ar)<=1:
+        return ar
+    if len(ar)==2:
+        return ar if ar[0]<ar[1] else [ar[1],ar[0]]
+
+
+    a,b,bs=ar[0],ar[1],ar[2:]
+    res = []
+    if a<b:
+        res = [a] + bubble_sort([b]+bs)
+    else:
+        res = [b] + bubble_sort([a]+bs)
+    return bubble_sort(res[:-1]) + res[-1:]
+
 def merge_sort(left, right):
-    
-    print(left)
-    print(right)
-    
     sort(left)
     sort(right)
+    print(left)
+    print(right)
 
 def sort(x):
-    if len(x) > 2:
+    if len(x) > 1:
         return merge_sort(x[:len(x)//2], x[len(x)//2:])
     return x
 
@@ -141,5 +154,5 @@ if __name__ == '__main__':
     set3 = [9, 8, 7, 6, 5, 4, 3, 2, 1]
     # print (intersect(set1,set2))
     # print (difference(set1, set2))
-    count = 0
     print(sort(set3))
+    #print(bubble_sort(set3))
