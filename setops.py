@@ -1,5 +1,6 @@
 from os.path import exists
 import sys
+sys.setrecursionlimit(10000)
 
 # ----------------------------------------- UTILS --------------------------------------------------
 
@@ -98,15 +99,23 @@ parse_command = lambda x: parse_args(x)
     #return bubble_sort(res[:-1]) + res[-1:]
 
 def merge_sort(left, right):
-    sort(left)
-    sort(right)
-    print(left)
-    print(right)
+    if left[0] > right[0]:
+        temp = left[0]
+        left[0] = right[0]
+        right[0] = temp
+        return left[0] + right[0] + merge_sort(left[1:], right[1:])
+    else:
+        return left[0] + right[0] + merge_sort(left[1:], right[1:])
+
+def split(left, right):
+    merge_sort(left, right)
 
 def sort(x):
-    if len(x) > 1:
-        return merge_sort(x[:len(x)//2], x[len(x)//2:])
-    return x
+    if len(x) < 2:
+        return x
+    #return split(x[:len(x)//2], x[len(x)//2:])
+    return tuple(split(x[:len(x)//2], x[len(x)//2:]))
+    
 
 # TODO
 read_from_file = lambda x: None
