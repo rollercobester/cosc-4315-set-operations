@@ -82,20 +82,20 @@ parse_command = lambda x: parse_args(x)
 
 # TODO
 
-def bubble_sort(ar): # Credit for this algorithm --> https://devansh42.medium.com/bubble-sort-without-loops-69166b854c67
-    if len(ar)<=1:
-        return ar
-    if len(ar)==2:
-        return ar if ar[0]<ar[1] else [ar[1],ar[0]]
+#def bubble_sort(ar): # Credit for this algorithm --> https://devansh42.medium.com/bubble-sort-without-loops-69166b854c67
+    #if len(ar)<=1:
+    #    return ar
+    #if len(ar)==2:
+    #    return ar if ar[0]<ar[1] else [ar[1],ar[0]]
 
 
-    a,b,bs=ar[0],ar[1],ar[2:]
-    res = []
-    if a<b:
-        res = [a] + bubble_sort([b]+bs)
-    else:
-        res = [b] + bubble_sort([a]+bs)
-    return bubble_sort(res[:-1]) + res[-1:]
+    #a,b,bs=ar[0],ar[1],ar[2:]
+    #res = []
+    #if a<b:
+    #   res = [a] + bubble_sort([b]+bs)
+    #else:
+    #    res = [b] + bubble_sort([a]+bs)
+    #return bubble_sort(res[:-1]) + res[-1:]
 
 def merge_sort(left, right):
     sort(left)
@@ -108,28 +108,23 @@ def sort(x):
         return merge_sort(x[:len(x)//2], x[len(x)//2:])
     return x
 
-# sort = lambda x: None
-
 # TODO
 read_from_file = lambda x: None
 
 # ----------------------------------------- Set Operations -----------------------------------------
 
-# TODO
 u_greater = lambda x, y: [y[0]] + union(x, y[1:]) if x[0]  > y[0] else []
 u_less    = lambda x, y: [x[0]] + union(x[1:], y) if x[0]  < y[0] else []
 u_match   = lambda x, y: union(x[1:], y)          if x[0] == y[0] else []
 u_compare = lambda x, y: u_greater(x, y) or u_less(x, y) or u_match(x, y)
 union     = lambda x, y: x if not y else y if not x else u_compare(x, y)
 
-# TODO
 d_greater  = lambda x, y: difference(x, y[1:])           if x[0] >  y[0] else []
 d_less     = lambda x, y: [x[0]] + difference(x[1:], y)  if x[0] <  y[0] else []
 d_match    = lambda x, y: difference(x[1:], y[1:])       if x[0] == y[0] else []
 d_compare  = lambda x, y: d_greater(x, y) or d_less(x, y) or d_match(x, y)
 difference = lambda x, y: x if not x or not y else d_compare(x,y)
 
-# TODO
 i_greater = lambda x, y: intersect(x, y[1:])              if x[0] >  y[0] else []
 i_less    = lambda x, y: intersect(x[1:], y)              if x[0] <  y[0] else []
 i_match   = lambda x, y: [x[0]] + intersect(x[1:], y[1:]) if x[0] == y[0] else []
