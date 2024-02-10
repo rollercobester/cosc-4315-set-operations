@@ -83,38 +83,9 @@ parse_command = lambda x: parse_args(x)
 
 # TODO
 
-#def bubble_sort(ar): # Credit for this algorithm --> https://devansh42.medium.com/bubble-sort-without-loops-69166b854c67
-    #if len(ar)<=1:
-    #    return ar
-    #if len(ar)==2:
-    #    return ar if ar[0]<ar[1] else [ar[1],ar[0]]
+merge = lambda l, r: l if not r else r if not l else [l[0]] +merge(l[1:], r) if l[0] < r[0] else [r[0]] + merge(l, r[1:])
 
-
-    #a,b,bs=ar[0],ar[1],ar[2:]
-    #res = []
-    #if a<b:
-    #   res = [a] + bubble_sort([b]+bs)
-    #else:
-    #    res = [b] + bubble_sort([a]+bs)
-    #return bubble_sort(res[:-1]) + res[-1:]
-
-def merge_sort(left, right):
-    if left[0] > right[0]:
-        temp = left[0]
-        left[0] = right[0]
-        right[0] = temp
-        return left[0] + right[0] + merge_sort(left[1:], right[1:])
-    else:
-        return left[0] + right[0] + merge_sort(left[1:], right[1:])
-
-def split(left, right):
-    merge_sort(left, right)
-
-def sort(x):
-    if len(x) < 2:
-        return x
-    #return split(x[:len(x)//2], x[len(x)//2:])
-    return tuple(split(x[:len(x)//2], x[len(x)//2:]))
+sort = lambda x: x if len(x)==1 else merge(sort(x[:len(x)//2]), sort(x[len(x)//2:]))
     
 
 # TODO
@@ -155,7 +126,8 @@ if __name__ == '__main__':
 
     set1 = ["Bird", "Cat", "Dog", "Moose", "Rabbit"]
     set2 = ["Apple", "Bird", "Hog", "Moose", "Tree", "Virginia"]
-    set3 = [9, 8, 7, 6, 5, 4, 3, 2, 1]
+    #set3 = [9, 8, 7, 6, 5, 4, 3, 2, 1]
+    set3 = ["Cougar", "Bird", "Cat", "Virginia", "Tree", "Apple"]
     # print (intersect(set1,set2))
     # print (difference(set1, set2))
     print(sort(set3))
