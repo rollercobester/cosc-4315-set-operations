@@ -1,5 +1,6 @@
 from os.path import exists
 import sys
+sys.setrecursionlimit(10000)
 
 # ----------------------------------------- UTILS --------------------------------------------------
 
@@ -81,7 +82,11 @@ parse_command = lambda x: parse_args(x)
 # ------------------------------------------ File Parser -------------------------------------------
 
 # TODO
-sort = lambda x: None
+
+merge = lambda l, r: l if not r else r if not l else [l[0]] +merge(l[1:], r) if l[0] < r[0] else [r[0]] + merge(l, r[1:])
+
+sort = lambda x: x if len(x)==1 else merge(sort(x[:len(x)//2]), sort(x[len(x)//2:]))
+    
 
 # TODO
 read_from_file = lambda x: None
@@ -124,5 +129,8 @@ if __name__ == '__main__':
 
     set1 = ["Bird", "Cat", "Dog", "Moose", "Rabbit"]
     set2 = ["Apple", "Bird", "Hog", "Moose", "Tree", "Virginia"]
-    #print (intersect(set1,set2))
-    print (difference(set1, set2))
+    #set3 = [9, 8, 7, 6, 5, 4, 3, 2, 1]
+    set3 = ["Cougar", "Bird", "Cat", "Virginia", "Tree", "Apple"]
+    # print (intersect(set1,set2))
+    # print (difference(set1, set2))
+    print(sort(set3))
