@@ -91,16 +91,13 @@ parse_command = lambda x: parse_args(x)
 
 list_to_set = lambda x: x if len(x) <= 1 else [x[0]] + list_to_set(x[1:]) if x[0] != x[1] else list_to_set(x[1:])
 
-letters_end_index = lambda x, i=0: i if i == len(x) or not (x[i].isalpha() or x[i] == '\'') else letters_end_index(x, i+1)
-numbers_end_index = lambda x, i=0, dec=False: i if i == len(x) or dec and x[i] == '.' or not (x[i].isnumeric() or x[i] == '.') else numbers_end_index(x, i+1, dec or x[i] == '.')
-word_end_index   = lambda x: letters_end_index(x) if x[0].isalpha() else numbers_end_index(x)
-
 def word_length_letters(text, length=0):
     word_broke = not text or (not text[0].isalpha() and text != "'")
     return length if word_broke else word_length_letters(text[1:], length + 1)
 
 def word_length_numbers(text, length=0, decimal_found=False):
     word_broke = not text or (decimal_found and text[0] == '.') or (not text[0].isnumeric() and text != '.')
+    decimal_found = decimal_found or text[0] == "."
     return length if word_broke else word_length_numbers(text[1:], length + 1)
 
 # Searches for the next alphanumeric character, finds the words length, returns the word and the remaining text
