@@ -89,25 +89,38 @@ parse_command = lambda x: parse_args(x)
 
 # ------------------------------------------ File Parser -------------------------------------------
 
-rmvDupes = lambda x: x if len(x) <= 1 else [x[0]] + rmvDupes(x[1:]) if x[0] != x[1] else rmvDupes(x[1:])
+list_to_set = lambda x: x if len(x) <= 1 else [x[0]] + list_to_set(x[1:]) if x[0] != x[1] else list_to_set(x[1:])
 
-word_start_index  = lambda x, i=0: i if i == len(x) or x[i].isalnum() else word_start_index(x, i+1)  
-letters_end_index = lambda x, i=0: i if i == len(x) or not x[i].isalpha() else letters_end_index(x, i+1)
+letters_end_index = lambda x, i=0: i if i == len(x) or not (x[i].isalpha() or x[i] == '\'') else letters_end_index(x, i+1)
 numbers_end_index = lambda x, i=0, dec=False: i if i == len(x) or dec and x[i] == '.' or not (x[i].isnumeric() or x[i] == '.') else numbers_end_index(x, i+1, dec or x[i] == '.')
-word_end_index    = lambda x: letters_end_index(x) if x[0].isalpha() else numbers_end_index(x)
+word_end_index   = lambda x: letters_end_index(x) if x[0].isalpha() else numbers_end_index(x)
 
-def split_words(text):
-    i = word_start_index(text)
-    if i == len(text):
-        return []
-    j = word_end_index(text, i) + 1
-    return [text[i:j]] + split_words(text[j:])
+def word_length_letters(text, length=0):
+    word_broke = not text or (not text[0].isalpha() and text != "'")
+    return length if word_broke else word_length_letters(text[1:], length + 1)
+
+def word_length_numbers(text, length=0, decimal_found=False):
+    word_broke = not text or (decimal_found and text[0] == '.') or (not text[0].isnumeric() and text != '.')
+    return length if word_broke else word_length_numbers(text[1:], length + 1)
+
+# Searches for the next alphanumeric character, finds the words length, returns the word and the remaining text
+def find_next_word(text):
+    if not text: 
+        return '', ''
+    elif not text[0].isalnum():
+        return find_next_word(text[1:])
+    i = word_length_letters(text) if text[0].isalpha() else word_length_numbers(text)
+    return text[:i], text[i:]
+
+# Takes a string and recursively finds the next word and builds a list of words
+def text_to_words(text):
+    word, remaining_text = find_next_word(text)
+    return [] if not word else [word] + text_to_words(remaining_text)
 
 def get_file_text(filename):
     with open(filename, 'r') as file:
         return combine(file.readlines())
         close(file)
-
 
 # ----------------------------------------- Set Operations -----------------------------------------
 
@@ -132,15 +145,17 @@ i_match   = lambda x, y: [x[0]] + intersect(x[1:], y[1:]) if x[0] == y[0] else [
 i_compare = lambda x, y: i_greater(x, y) or i_less(x, y) or i_match(x, y)
 intersect = lambda x, y: [] if not x or not y else i_compare(x, y)
 
-def perform_operations(set1, set2, operation):
-    if operation == 'union': union(set1, set2)
-    elif operation == 'difference': difference(set1, set2)
-    elif operation == 'intersection': intersect(set1, set2)
+def perform_operation(set1, set2, operation):
+    if operation == 'union': return union(set1, set2)
+    elif operation == 'difference': return difference(set1, set2)
+    elif operation == 'intersection': return intersect(set1, set2)
 
 # --------------------------------------------------------------------------------------------------
 
 if __name__ == '__main__':
    filename1, filename2, operation = parse_command(sys.argv[1:])
-   set1 = sort(list_to_set(read_from_file(filename1)))
-   set2 = sort(list_to_set(read_from_file(filename2)))
-   perform_operation(set1, set2, operation)
+   set1 = list_to_set(sort(text_to_words(get_file_text(filename1))))
+   set2 = list_to_set(sort(text_to_words(get_file_text(filename2))))
+   print(set1)
+   # print(perform_operation(set1, set2, operation))
+   #print(get_file_text(filename1))
