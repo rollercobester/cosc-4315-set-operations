@@ -89,10 +89,16 @@ parse_command = lambda x: parse_args(x)
 
 # ------------------------------------------ File Parser -------------------------------------------
 
+<<<<<<< HEAD
 word_start_index  = lambda x, i=0: i if i == len(x) or x[i].isalnum() else word_start_index(x, i+1)  
 letters_end_index = lambda x, i=0: i if i == len(x) or not x[i].isalpha() else letters_end_index(x, i+1)
 numbers_end_index = lambda x, i=0, dec=False: i if i == len(x) or dec and x[i] == '.' or not (x[i].isnumeric() or x[i] == '.') else numbers_end_index(x, i+1, dec or x[i] == '.')
 word_end_index    = lambda x: letters_end_index(x) if x[0].isalpha() else numbers_end_index(x)
+=======
+rmvDupes = lambda x: x if len(x) <= 1 else [x[0]] + rmvDupes(x[1:]) if x[0] != x[1] else rmvDupes(x[1:])
+
+# TODO
+>>>>>>> c22dd31bdfb5ec693ee3bb1abe017d73209d93aa
 
 def split_words(text):
     i = word_start_index(text)
