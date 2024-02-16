@@ -81,6 +81,8 @@ parse_command = lambda x: parse_args(x)
 
 # ------------------------------------------ File Parser -------------------------------------------
 
+rmvDupes = lambda x: x if len(x) <= 1 else [x[0]] + rmvDupes(x[1:]) if x[0] != x[1] else rmvDupes(x[1:])
+
 # TODO
 
 merge = lambda l, r: l if not r else r if not l else [l[0]] +merge(l[1:], r) if l[0] < r[0] else [r[0]] + merge(l, r[1:])
