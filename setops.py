@@ -1,5 +1,7 @@
+from functools import reduce
 from os.path import exists
 import sys
+
 sys.setrecursionlimit(10000)
 
 # ----------------------------------------- UTILS --------------------------------------------------
@@ -11,8 +13,14 @@ split = lambda x, y: splitter(x, y, x.find(y))
 
 # Mimics x.replace(y, z) where x is a string
 # Ex: replace("a b c", ' ', '') = "abc"
-replacer = lambda x, y, z: x if x != y else z
-replace = lambda x, y, z: x if x == '' else replacer(x[0], y, z) + replace(x[1:], y, z) 
+replacer = lambda x, a, b: b if x == a else x
+replace = lambda x, a, b: x if not x or not a else replacer(x[0], a, b) + replace(x[1:], a, b) 
+
+combine = lambda x: reduce(lambda a, b: a + b, x)
+
+# Merge sort
+merge = lambda l, r: l if not r else r if not l else [l[0]] + merge(l[1:], r) if l[0] < r[0] else [r[0]] + merge(l, r[1:])
+sort = lambda x: x if len(x)==1 else merge(sort(x[:len(x)//2]), sort(x[len(x)//2:]))
 
 def print_error(message):
     print('Error: {}'.format(message))
@@ -81,15 +89,23 @@ parse_command = lambda x: parse_args(x)
 
 # ------------------------------------------ File Parser -------------------------------------------
 
-# TODO
+word_start_index  = lambda x, i=0: i if i == len(x) or x[i].isalnum() else word_start_index(x, i+1)  
+letters_end_index = lambda x, i=0: i if i == len(x) or not x[i].isalpha() else letters_end_index(x, i+1)
+numbers_end_index = lambda x, i=0, dec=False: i if i == len(x) or dec and x[i] == '.' or not (x[i].isnumeric() or x[i] == '.') else numbers_end_index(x, i+1, dec or x[i] == '.')
+word_end_index    = lambda x: letters_end_index(x) if x[0].isalpha() else numbers_end_index(x)
 
-merge = lambda l, r: l if not r else r if not l else [l[0]] +merge(l[1:], r) if l[0] < r[0] else [r[0]] + merge(l, r[1:])
+def split_words(text):
+    i = word_start_index(text)
+    if i == len(text):
+        return []
+    j = word_end_index(text, i) + 1
+    return [text[i:j]] + split_words(text[j:])
 
-sort = lambda x: x if len(x)==1 else merge(sort(x[:len(x)//2]), sort(x[len(x)//2:]))
-    
+def get_file_text(filename):
+    with open(filename, 'r') as file:
+        return combine(file.readlines())
+        close(file)
 
-# TODO
-read_from_file = lambda x: None
 
 # ----------------------------------------- Set Operations -----------------------------------------
 
@@ -101,9 +117,9 @@ u_compare = lambda x, y: u_greater(x, y) or u_less(x, y) or u_match(x, y)
 union     = lambda x, y: x if not y else y if not x else u_compare(x, y)
 
 # Difference set operation
-d_greater  = lambda x, y: difference(x, y[1:])           if x[0] >  y[0] else []
-d_less     = lambda x, y: [x[0]] + difference(x[1:], y)  if x[0] <  y[0] else []
-d_match    = lambda x, y: difference(x[1:], y[1:])       if x[0] == y[0] else []
+d_greater  = lambda x, y: difference(x, y[1:])          if x[0] >  y[0] else []
+d_less     = lambda x, y: [x[0]] + difference(x[1:], y) if x[0] <  y[0] else []
+d_match    = lambda x, y: difference(x[1:], y[1:])      if x[0] == y[0] else []
 d_compare  = lambda x, y: d_greater(x, y) or d_less(x, y) or d_match(x, y)
 difference = lambda x, y: x if not x or not y else d_compare(x,y)
 
@@ -122,15 +138,7 @@ def perform_operations(set1, set2, operation):
 # --------------------------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-   # filename1, filename2, operation = parse_command(sys.argv[1:])
-   # set1 = read_from_file(filename1)
-   # set2 = read_from_file(filename2)
-   # perform_operation(sort(set1), sort(set2), operation)
-
-    set1 = ["Bird", "Cat", "Dog", "Moose", "Rabbit"]
-    set2 = ["Apple", "Bird", "Hog", "Moose", "Tree", "Virginia"]
-    #set3 = [9, 8, 7, 6, 5, 4, 3, 2, 1]
-    set3 = ["Cougar", "Bird", "Cat", "Virginia", "Tree", "Apple"]
-    # print (intersect(set1,set2))
-    # print (difference(set1, set2))
-    print(sort(set3))
+   filename1, filename2, operation = parse_command(sys.argv[1:])
+   set1 = sort(list_to_set(read_from_file(filename1)))
+   set2 = sort(list_to_set(read_from_file(filename2)))
+   perform_operation(set1, set2, operation)
