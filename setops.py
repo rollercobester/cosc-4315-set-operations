@@ -1,5 +1,7 @@
+from functools import reduce
 from os.path import exists
 import sys
+
 sys.setrecursionlimit(10000)
 
 # ----------------------------------------- UTILS --------------------------------------------------
@@ -11,8 +13,14 @@ split = lambda x, y: splitter(x, y, x.find(y))
 
 # Mimics x.replace(y, z) where x is a string
 # Ex: replace("a b c", ' ', '') = "abc"
-replacer = lambda x, y, z: x if x != y else z
-replace = lambda x, y, z: x if x == '' else replacer(x[0], y, z) + replace(x[1:], y, z) 
+replacer = lambda x, a, b: b if x == a else x
+replace = lambda x, a, b: x if not x or not a else replacer(x[0], a, b) + replace(x[1:], a, b) 
+
+combine = lambda x: reduce(lambda a, b: a + b, x)
+
+# Merge sort
+merge = lambda l, r: l if not r else r if not l else [l[0]] + merge(l[1:], r) if l[0] < r[0] else [r[0]] + merge(l, r[1:])
+sort = lambda x: x if len(x)==1 else merge(sort(x[:len(x)//2]), sort(x[len(x)//2:]))
 
 def print_error(message):
     print('Error: {}'.format(message))
@@ -81,17 +89,35 @@ parse_command = lambda x: parse_args(x)
 
 # ------------------------------------------ File Parser -------------------------------------------
 
-rmvDupes = lambda x: x if len(x) <= 1 else [x[0]] + rmvDupes(x[1:]) if x[0] != x[1] else rmvDupes(x[1:])
+list_to_set = lambda x: x if len(x) <= 1 else [x[0]] + list_to_set(x[1:]) if x[0] != x[1] else list_to_set(x[1:])
 
-# TODO
+def word_length_letters(text, length=0):
+    word_broke = not text or (not text[0].isalpha() and text != "'")
+    return length if word_broke else word_length_letters(text[1:], length + 1)
 
-merge = lambda l, r: l if not r else r if not l else [l[0]] +merge(l[1:], r) if l[0] < r[0] else [r[0]] + merge(l, r[1:])
+def word_length_numbers(text, length=0, decimal_found=False):
+    word_broke = not text or (decimal_found and text[0] == '.') or (not text[0].isnumeric() and text != '.')
+    decimal_found = decimal_found or text[0] == "."
+    return length if word_broke else word_length_numbers(text[1:], length + 1)
 
-sort = lambda x: x if len(x)==1 else merge(sort(x[:len(x)//2]), sort(x[len(x)//2:]))
-    
+# Searches for the next alphanumeric character, finds the words length, returns the word and the remaining text
+def find_next_word(text):
+    if not text: 
+        return '', ''
+    elif not text[0].isalnum():
+        return find_next_word(text[1:])
+    i = word_length_letters(text) if text[0].isalpha() else word_length_numbers(text)
+    return text[:i], text[i:]
 
-# TODO
-read_from_file = lambda x: None
+# Takes a string and recursively finds the next word and builds a list of words
+def text_to_words(text):
+    word, remaining_text = find_next_word(text)
+    return [] if not word else [word] + text_to_words(remaining_text)
+
+def get_file_text(filename):
+    with open(filename, 'r') as file:
+        return combine(file.readlines())
+        close(file)
 
 # ----------------------------------------- Set Operations -----------------------------------------
 
@@ -103,9 +129,9 @@ u_compare = lambda x, y: u_greater(x, y) or u_less(x, y) or u_match(x, y)
 union     = lambda x, y: x if not y else y if not x else u_compare(x, y)
 
 # Difference set operation
-d_greater  = lambda x, y: difference(x, y[1:])           if x[0] >  y[0] else []
-d_less     = lambda x, y: [x[0]] + difference(x[1:], y)  if x[0] <  y[0] else []
-d_match    = lambda x, y: difference(x[1:], y[1:])       if x[0] == y[0] else []
+d_greater  = lambda x, y: difference(x, y[1:])          if x[0] >  y[0] else []
+d_less     = lambda x, y: [x[0]] + difference(x[1:], y) if x[0] <  y[0] else []
+d_match    = lambda x, y: difference(x[1:], y[1:])      if x[0] == y[0] else []
 d_compare  = lambda x, y: d_greater(x, y) or d_less(x, y) or d_match(x, y)
 difference = lambda x, y: x if not x or not y else d_compare(x,y)
 
@@ -116,23 +142,17 @@ i_match   = lambda x, y: [x[0]] + intersect(x[1:], y[1:]) if x[0] == y[0] else [
 i_compare = lambda x, y: i_greater(x, y) or i_less(x, y) or i_match(x, y)
 intersect = lambda x, y: [] if not x or not y else i_compare(x, y)
 
-def perform_operations(set1, set2, operation):
-    if operation == 'union': union(set1, set2)
-    elif operation == 'difference': difference(set1, set2)
-    elif operation == 'intersection': intersect(set1, set2)
+def perform_operation(set1, set2, operation):
+    if operation == 'union': return union(set1, set2)
+    elif operation == 'difference': return difference(set1, set2)
+    elif operation == 'intersection': return intersect(set1, set2)
 
 # --------------------------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-   # filename1, filename2, operation = parse_command(sys.argv[1:])
-   # set1 = read_from_file(filename1)
-   # set2 = read_from_file(filename2)
-   # perform_operation(sort(set1), sort(set2), operation)
-
-    set1 = ["Bird", "Cat", "Dog", "Moose", "Rabbit"]
-    set2 = ["Apple", "Bird", "Hog", "Moose", "Tree", "Virginia"]
-    #set3 = [9, 8, 7, 6, 5, 4, 3, 2, 1]
-    set3 = ["Cougar", "Bird", "Cat", "Virginia", "Tree", "Apple"]
-    # print (intersect(set1,set2))
-    # print (difference(set1, set2))
-    print(sort(set3))
+   filename1, filename2, operation = parse_command(sys.argv[1:])
+   set1 = list_to_set(sort(text_to_words(get_file_text(filename1))))
+   set2 = list_to_set(sort(text_to_words(get_file_text(filename2))))
+   print(set1)
+   # print(perform_operation(set1, set2, operation))
+   #print(get_file_text(filename1))
