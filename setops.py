@@ -30,7 +30,7 @@ def print_error(message):
     exit(0)
 
 def print_help():
-    print('Call syntax: python3 setops.py "set1=[filename];set2=[filename];operation=[difference|union|intersection]"')
+    print('Call syntax: python3 setops.py set1=[filename];set2=[filename];operation=[difference|union|intersection]"')
     exit(0)
 
 # Splits a string into a list of substrings determined by the separator
@@ -78,6 +78,7 @@ def parse_kwargs(text):
 def parse_command(args):
     if len(args) == 0: print_error("not enough arguments")
     if len(args) >= 2: print_error("too many arguments")
+    if args[0] in ['h', 'help', '-h', '-help', '--h', '--help']: print_help()
     kwargs = parse_kwargs(strip_spaces(args[0]))
     keys, values = zip(*filter_kwargs(kwargs))
     missing_key = next(filter(lambda x: x not in keys, valid_keys), None)
@@ -111,9 +112,12 @@ def word_length_letters(text, length=0):
 def word_length_numbers(text, length=0, decimal_found=False):
     if not text: return length
     head, *tail = text
-    word_broke = not head or (decimal_found and head == '.') or (not head.isnumeric() and head != '.')
-    decimal_found = decimal_found or head == "."
-    return length if word_broke else word_length_numbers(tail, length + 1)
+    non_number_character = (not head.isnumeric() and head != '.')
+    second_decimal       = (head == '.' and decimal_found)
+    unfollowed_decimal   = (head == '.' and (len(text) == 1 or not text[1].isnumeric()))
+    word_broke = not head or non_number_character or second_decimal or unfollowed_decimal
+    decimal_found = decimal_found or head == '.'
+    return length if word_broke else word_length_numbers(tail, length + 1, decimal_found)
 
 # Searches for the next alphanumeric character, finds the words length, returns the word and the remaining text
 def find_next_word(text):
@@ -138,7 +142,7 @@ def to_lowercase(text):
 def get_file_text(filename):
     with open(filename, 'r') as file:
         text = combine(file.readlines())
-        close(file)
+        file.close()
         return text
 
 def write_to_file(wordset):
