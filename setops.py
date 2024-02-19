@@ -10,20 +10,19 @@ sys.setrecursionlimit(10000)
 # Ex: split("a b c", ' ') = ["a", "b", "c"]
 def split(text, sep):
     i = text.find(sep)
-    return [text] if i == -1 else [text[:i]] + split(text[i+1:], sep)
+    if i == -1:
+        return [text]
+    return [text[:i]] + split(text[i+1:], sep)
 
 # Mimics x.replace(y, z) where x is a string
 # Ex: replace("a b c", ' ', '') = "abc"
 def replace(text, old, new):
     i = text.find(old)
-    if i == -1: return text
+    if i == -1:
+        return text
     return text[:i] + new + replace(text[i+len(old):], old, new)
 
 combine = lambda x: reduce(lambda a, b: a + b, x)
-
-# Merge sort
-merge = lambda l, r: l if not r else r if not l else [l[0]] + merge(l[1:], r) if l[0] < r[0] else [r[0]] + merge(l, r[1:])
-sort = lambda x: x if len(x)==1 else merge(sort(x[:len(x)//2]), sort(x[len(x)//2:]))
 
 def print_error(message):
     print('Error: {}'.format(message))
@@ -84,22 +83,37 @@ extract_kwargs = lambda x: filter_kwargs(parse_kwargs(strip_spaces(x)))
 # Prints error message for invalid # of args
 invalid_args = lambda x: print_error('too many arguments') if x else print_error('not enough arguments')
 
-# Checks for 1 argument and sends it to be parsed into keyword arguments
-parse_args = lambda x: extract_kwargs(x[0]) if len(x) == 1 else invalid_args(x)
-
 # Retrieves arguments and sends them to be validated
-parse_command = lambda x: parse_args(x)
+parse_command = lambda x: extract_kwargs(x[0]) if len(x) == 1 else invalid_args(x)
 
 # ------------------------------------------ File Parser -------------------------------------------
 
-list_to_set = lambda x: x if len(x) <= 1 else [x[0]] + list_to_set(x[1:]) if x[0] != x[1] else list_to_set(x[1:])
+def list_to_set(x):
+    if len(x) <= 1:    return x
+    elif x[0] != x[1]: return [x[0]] + list_to_set(x[1:])
+    else:              return list_to_set(x[1:])
+
+def merge_sort(x):
+
+    def merge(l, r):
+        if not r:         return l
+        elif not l:       return r
+        elif l[0] < r[0]: return [l[0]] + merge(l[1:], r)
+        else:             return [r[0]] + merge(l, r[1:])
+
+    if len(x) <= 1: return x
+    m = len(x) // 2
+    l, r = x[:m], x[m:]
+    return merge(merge_sort(l), merge_sort(r))
 
 def word_length_letters(text, length=0):
+    if not text: return length
     head, *tail = text
     word_broke = not head or (not head.isalpha() and head != "'")
     return length if word_broke else word_length_letters(tail, length + 1)
 
 def word_length_numbers(text, length=0, decimal_found=False):
+    if not text: return length
     head, *tail = text
     word_broke = not head or (decimal_found and head == '.') or (not head.isnumeric() and head != '.')
     decimal_found = decimal_found or head == "."
@@ -107,17 +121,23 @@ def word_length_numbers(text, length=0, decimal_found=False):
 
 # Searches for the next alphanumeric character, finds the words length, returns the word and the remaining text
 def find_next_word(text):
-    if not text: 
+    if not text:
         return '', ''
     elif not text[0].isalnum():
         return find_next_word(text[1:])
-    i = word_length_letters(text) if text[0].isalpha() else word_length_numbers(text)
+    i = word_length_letters(text) or word_length_numbers(text)
     return text[:i], text[i:]
 
 # Takes a string and recursively finds the next word and builds a list of words
 def text_to_words(text):
     word, remaining_text = find_next_word(text)
     return [] if not word else [word] + text_to_words(remaining_text)
+
+def to_lowercase(text):
+    if not text: return ''
+    head, *tail = text
+    char = chr(ord(head) + 32) if 'A' <= head <= 'Z' else head
+    return char + to_lowercase(tail)
 
 def get_file_text(filename):
     with open(filename, 'r') as file:
@@ -158,10 +178,13 @@ def perform_operation(set1, set2, operation):
     elif operation == 'difference': return difference(set1, set2)
     elif operation == 'intersection': return intersect(set1, set2)
 
+
 # --------------------------------------------------------------------------------------------------
 
 if __name__ == '__main__':
    filename1, filename2, operation = parse_command(sys.argv[1:])
-   set1 = list_to_set(sort(text_to_words(get_file_text(filename1))))
-   set2 = list_to_set(sort(text_to_words(get_file_text(filename2))))
+   words1 = text_to_words(to_lowercase(get_file_text(filename1)))
+   words2 = text_to_words(to_lowercase(get_file_text(filename2)))
+   set1 = list_to_set(merge_sort(words1))
+   set2 = list_to_set(merge_sort(words2))
    print(perform_operation(set1, set2, operation))
