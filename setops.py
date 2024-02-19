@@ -4,35 +4,7 @@ import sys
 
 sys.setrecursionlimit(10000)
 
-# ----------------------------------------- UTILS --------------------------------------------------
-
-# Mimics x.split(y) where x is a string
-# Ex: split("a b c", ' ') = ["a", "b", "c"]
-def split(text, sep):
-    i = text.find(sep)
-    if i == -1:
-        return [text]
-    return [text[:i]] + split(text[i+1:], sep)
-
-# Mimics x.replace(y, z) where x is a string
-# Ex: replace("a b c", ' ', '') = "abc"
-def replace(text, old, new):
-    i = text.find(old)
-    if i == -1:
-        return text
-    return text[:i] + new + replace(text[i+len(old):], old, new)
-
-combine = lambda x: reduce(lambda a, b: a + b, x)
-
-def print_error(message):
-    print('Error: {}'.format(message))
-    exit(0)
-
-def print_help():
-    print('Call syntax: python3 setops.py "set1=[filename];set2=[filename];operation=[difference|union|intersection]"')
-    exit(0)
-
-# ------------------------------------- COMMAND PARSER ---------------------------------------------
+# ------------------------------------- COMMAND SPECIFICATIONS ---------------------------------------------
 
 # Value validation functions
 filename_predicate = lambda x: exists(x)
@@ -50,6 +22,38 @@ valid_kwargs = [
 
 valid_keys = list(zip(*valid_kwargs))[0]
 
+# ----------------------------------------- UTILS --------------------------------------------------
+
+def print_error(message):
+    print("Error: {}".format(message))
+    exit(0)
+
+def print_help():
+    print('Call syntax: python3 setops.py "set1=[filename];set2=[filename];operation=[difference|union|intersection]"')
+    exit(0)
+
+# Splits a string into a list of substrings determined by the separator
+# params: text (str), sep (str)
+# returns: list of substrings
+def split(text, sep):
+    i = text.find(sep)
+    if i == -1:
+        return [text]
+    return [text[:i]] + split(text[i+1:], sep)
+
+# Replaces all instances of a certain substring in a string with another string
+# params: text (str), old (str), new (str)
+def replace(text, old, new):
+    i = text.find(old)
+    if i == -1:
+        return text
+    return text[:i] + new + replace(text[i+len(old):], old, new)
+
+combine = lambda x: reduce(lambda a, b: a + b, x)
+strip_spaces = lambda x: replace(x, ' ', '')
+
+# ------------------------------------- COMMAND PARSER ---------------------------------------------
+
 # Takes a list of assertions to be made on the kwarg values and validates them
 def validate_values(assertions):
     failed_assertion = next(filter(lambda x: not x[1](x[0]), assertions), None)
@@ -59,32 +63,31 @@ def validate_values(assertions):
 
 # Takes keys and values and returns a list of value assertions [(value, predicate, error_message), ...]
 # Forces the same order as the predefined valid_kwargs
-generate_assertions = lambda keys, values: tuple(map(lambda x: [values[keys.index(x[0])], x[1], x[2]], valid_kwargs))
-
-# Checks kwargs for missing keys then sends them to have their values validated
-def validate_keys(kwargs):
-    keys, values = zip(*kwargs)
-    missing_key = next(filter(lambda x: x not in keys, valid_keys), None)
-    if missing_key: print_error("missing key '{}'".format(missing_key)) 
-    return validate_values(generate_assertions(keys, values))
+def generate_assertions(keys, values):
+    return list(map(lambda x: [values[keys.index(x[0])], x[1], x[2]], valid_kwargs))
 
 # Filters out kwargs with irrelevant keys and sends the rest to be validated
-filter_kwargs = lambda x: validate_keys(list(filter(lambda x: x[0] in valid_keys, x)))
+def filter_kwargs(kwargs):
+    return list(filter(lambda x: x[0] in valid_keys, kwargs))
 
-# Takes a string of kwargs and returns a list of key-value pairs [[key, value], ...]
-parse_kwargs = lambda x: list(map(lambda x_: split(x_, '='), split(x, ';')))
+# Takes a string of keyword arguments and returns a list of key-value pairs [[key, value], ...]
+def parse_kwargs(text):
+    return list(map(lambda x: split(x, '='), split(text, ';')))
 
-# Takes a string and returns it without spaces
-strip_spaces = lambda x: replace(x, ' ', '')
+def parse_command(args):
+    if len(args) == 0: print_error("not enough arguments")
+    if len(args) >= 2: print_error("too many arguments")
 
-# Takes a string argument containing kwargs and sends it to get parsed and filtered
-extract_kwargs = lambda x: filter_kwargs(parse_kwargs(strip_spaces(x)))
+    kwargs = parse_kwargs(strip_spaces(args[0]))
+    keys, values = zip(*filter_kwargs(kwargs))
 
-# Prints error message for invalid # of args
-invalid_args = lambda x: print_error('too many arguments') if x else print_error('not enough arguments')
+    missing_key = next(filter(lambda x: x not in keys, valid_keys), None)
+    if missing_key: print_error("missing key '{}'".format(missing_key))
 
-# Retrieves arguments and sends them to be validated
-parse_command = lambda x: extract_kwargs(x[0]) if len(x) == 1 else invalid_args(x)
+    value_assertions = generate_assertions(keys, values)
+    return validate_values(value_assertions)
+
+
 
 # ------------------------------------------ File Parser -------------------------------------------
 
