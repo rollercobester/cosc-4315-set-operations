@@ -162,7 +162,7 @@ const writeToFile = (wordset) => {
     const text = wordset.map((word) => word + '\n').join('');
     const outputFilename = `output${nextNumber}.txt`;
 
-    fs.writeFileSync(outputFilename, text);
+    fs.writeFileSync(outputFilename, text.substring(0, text.length - 1));
 };
 // ----------------------------------------- Set Operations -----------------------------------------
 
