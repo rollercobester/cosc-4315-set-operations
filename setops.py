@@ -140,7 +140,7 @@ def to_lowercase(text):
     return char + to_lowercase(tail)
 
 def get_file_text(filename):
-    with open(filename, 'r') as file:
+    with open(filename, 'r', encoding="utf-8") as file:
         text = combine(file.readlines())
         file.close()
         return text
