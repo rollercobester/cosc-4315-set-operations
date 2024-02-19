@@ -1,5 +1,6 @@
 from functools import reduce
 from os.path import exists
+from os import listdir
 import sys
 
 sys.setrecursionlimit(10000)
@@ -147,6 +148,15 @@ def get_file_text(filename):
         return combine(file.readlines())
         close(file)
 
+def write_to_file(wordset):
+    output_filenames = list(filter(lambda f: f.startswith("output") and f.endswith(".txt"), listdir()))
+    output_numbers = list(map(lambda f: int(f[6:-4]), output_filenames))
+    next_number = 1 if not output_filenames else max(output_numbers) + 1
+    text = combine(map(lambda word: word + "\n", wordset))
+    with open("output{}.txt".format(next_number), "w") as output_file:
+        output_file.write(text[:-1])
+
+
 # ----------------------------------------- Set Operations -----------------------------------------
 
 # Union set operation
@@ -190,4 +200,5 @@ if __name__ == '__main__':
    words2 = text_to_words(to_lowercase(get_file_text(filename2)))
    set1 = list_to_set(merge_sort(words1))
    set2 = list_to_set(merge_sort(words2))
-   print(perform_operation(set1, set2, operation))
+   wordset = perform_operation(set1, set2, operation)
+   write_to_file(wordset)
