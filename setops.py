@@ -137,8 +137,9 @@ def to_lowercase(text):
 
 def get_file_text(filename):
     with open(filename, 'r') as file:
-        return combine(file.readlines())
+        text = combine(file.readlines())
         close(file)
+        return text
 
 def write_to_file(wordset):
     output_filenames = list(filter(lambda f: f.startswith("output") and f.endswith(".txt"), listdir()))
