@@ -141,6 +141,8 @@ def to_lowercase(text):
 
 def get_file_text(filename):
     with open(filename, 'r', encoding="utf-8") as file:
+        lines = file.readlines()
+        
         text = combine(file.readlines())
         file.close()
         return text
@@ -152,7 +154,6 @@ def write_to_file(wordset):
     text = combine(map(lambda word: word + "\n", wordset))
     with open("output{}.txt".format(next_number), "w") as output_file:
         output_file.write(text[:-1])
-
 
 # ----------------------------------------- Set Operations -----------------------------------------
 
