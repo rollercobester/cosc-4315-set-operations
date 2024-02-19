@@ -98,17 +98,14 @@ def list_to_set(x):
     else:              return list_to_set(x[1:])
 
 def merge_sort(x):
-
     def merge(l, r):
         if not r:         return l
         elif not l:       return r
         elif l[0] < r[0]: return [l[0]] + merge(l[1:], r)
         else:             return [r[0]] + merge(l, r[1:])
-
     if len(x) <= 1: return x
     m = len(x) // 2
-    l, r = x[:m], x[m:]
-    return merge(merge_sort(l), merge_sort(r))
+    return merge(merge_sort(x[:m]), merge_sort(x[m:]))
 
 def word_length_letters(text, length=0):
     if not text: return length
