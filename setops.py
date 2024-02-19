@@ -78,13 +78,10 @@ def parse_kwargs(text):
 def parse_command(args):
     if len(args) == 0: print_error("not enough arguments")
     if len(args) >= 2: print_error("too many arguments")
-
     kwargs = parse_kwargs(strip_spaces(args[0]))
     keys, values = zip(*filter_kwargs(kwargs))
-
     missing_key = next(filter(lambda x: x not in keys, valid_keys), None)
     if missing_key: print_error("missing key '{}'".format(missing_key))
-
     value_assertions = generate_assertions(keys, values)
     return validate_values(value_assertions)
 
