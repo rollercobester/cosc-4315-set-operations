@@ -85,8 +85,6 @@ def parse_command(args):
     value_assertions = generate_assertions(keys, values)
     return validate_values(value_assertions)
 
-
-
 # ------------------------------------------ File Parser -------------------------------------------
 
 def list_to_set(x):
