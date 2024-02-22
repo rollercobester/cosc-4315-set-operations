@@ -44,8 +44,6 @@ const replace = (text, old, _new) => {
     return text.slice(0, i) + _new + replace(text.slice(i + old.length), old, _new);
 };
 
-const combine = (x) => x.reduce((a, b) => a + b, '');
-
 const stripSpaces = (x) => replace(x, ' ', '');
 
 const isLetter = (x) => (x >= 'a' && x <= 'z') || (x >= 'A' && x <= 'Z');
