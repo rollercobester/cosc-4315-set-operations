@@ -48,6 +48,12 @@ const combine = (x) => x.reduce((a, b) => a + b, '');
 
 const stripSpaces = (x) => replace(x, ' ', '');
 
+const isLetter = (x) => (x >= 'a' && x <= 'z') || (x >= 'A' && x <= 'Z');
+
+const isNumber = (x) => x >= '0' && x <= '9';
+
+const isAlphaNumeric = (x) => isLetter(x) || isNumber(x);
+
 // ... (rest of the Python utils functions remain the same)
 
 // ------------------------------------- COMMAND PARSER ---------------------------------------------
@@ -108,16 +114,16 @@ const mergeSort = (x) => {
 const wordLengthLetters = (text, length = 0) => {
     if (!text.length) return length;
     const [head, ...tail] = text;
-    const wordBroke = !head || (!head.match(/[a-zA-Z]/) && head !== "'");
+    const wordBroke = !head || (!isLetter(head) && head !== "'");
     return wordBroke ? length : wordLengthLetters(tail, length + 1);
 };
 
 const wordLengthNumbers = (text, length = 0, decimalFound = false) => {
     if (!text.length) return length;
     const [head, ...tail] = text;
-    const nonNumberCharacter = (!head.match(/[0-9]/) && head !== ".")
+    const nonNumberCharacter = (!isNumber(head) && head !== ".")
     const secondDecimal      = (head === '.' && decimalFound)
-    const unfollowedDecimal  = (head === '.' && (text.length == 1 || !text[1].match(/[0-9]/)));
+    const unfollowedDecimal  = (head === '.' && (text.length == 1 || !isNumber(text[1])));
     const wordBroke = !head || nonNumberCharacter || secondDecimal || unfollowedDecimal;
     decimalFound = decimalFound || head === ".";
     return wordBroke ? length : wordLengthNumbers(tail, length + 1, decimalFound);
@@ -126,9 +132,9 @@ const wordLengthNumbers = (text, length = 0, decimalFound = false) => {
 const findNextWord = (text) => {
     if (!text.length)
         return ['', ''];
-    else if (!text[0].match(/[a-zA-Z0-9]/))
+    else if (!isAlphaNumeric(text[0]))
         return findNextWord(text.slice(1));
-    else if (text[0].match(/[a-zA-Z]/)) {
+    else if (isLetter(text[0])) {
         const i = wordLengthLetters(text);
         return [text.slice(0, i), text.slice(i)];
     } else {
@@ -215,5 +221,4 @@ if (require.main === module) {
     const set2 = listToSet(mergeSort(words2));
     const wordset = performOperation(set1, set2, operation);
     writeToFile(wordset);
-    //console.log(union(['a', 'b', 'c'], ['b', 'c', 'd', 'e']))
 }
