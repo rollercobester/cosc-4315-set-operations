@@ -156,8 +156,7 @@ const toLowercase = (text) => {
 };
 
 const getFileText = (filename) => {
-    const text = fs.readFileSync(filename, 'utf8');
-    return text;  // Combining lines into a single string
+    return fs.readFileSync(filename, 'utf8');
 };
 
 const writeToFile = (wordset) => {
