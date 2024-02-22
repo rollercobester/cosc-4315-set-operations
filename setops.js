@@ -10,7 +10,7 @@ const operationError = (operation) => `operation '${operation}' does not exist\n
 
 // Command specifications
 const validKwargs = [
-    // Key         Value validator      Error message
+    // Key        Value validator     Error message
     ["set1",      filenamePredicate,  filenameError],
     ["set2",      filenamePredicate,  filenameError],
     ["operation", operationPredicate, operationError],
