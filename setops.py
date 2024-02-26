@@ -50,7 +50,7 @@ def replace(text, old, new):
         return text
     return text[:i] + new + replace(text[i+len(old):], old, new)
 
-combine = lambda x: reduce(lambda a, b: a + b, x)
+combine = lambda x: '' if not x else reduce(lambda a, b: a + b, x)
 strip_spaces = lambda x: replace(x, ' ', '')
 
 # ------------------------------------- COMMAND PARSER ---------------------------------------------
@@ -141,8 +141,6 @@ def to_lowercase(text):
 
 def get_file_text(filename):
     with open(filename, 'r', encoding="utf-8") as file:
-        lines = file.readlines()
-        
         text = combine(file.readlines())
         file.close()
         return text
@@ -151,7 +149,7 @@ def write_to_file(wordset):
     output_filenames = list(filter(lambda f: f.startswith("output") and f.endswith(".txt"), listdir()))
     output_numbers = list(map(lambda f: int(f[6:-4]), output_filenames))
     next_number = 1 if not output_filenames else max(output_numbers) + 1
-    text = combine(map(lambda word: word + "\n", wordset))
+    text = combine(list(map(lambda word: word + "\n", wordset)))
     with open("output{}.txt".format(next_number), "w") as output_file:
         output_file.write(text[:-1])
 
@@ -193,10 +191,10 @@ def perform_operation(set1, set2, operation):
 # --------------------------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-   filename1, filename2, operation = parse_command(sys.argv[1:])
-   words1 = text_to_words(to_lowercase(get_file_text(filename1)))
-   words2 = text_to_words(to_lowercase(get_file_text(filename2)))
-   set1 = list_to_set(merge_sort(words1))
-   set2 = list_to_set(merge_sort(words2))
-   wordset = perform_operation(set1, set2, operation)
-   write_to_file(wordset)
+    filename1, filename2, operation = parse_command(sys.argv[1:])
+    words1 = text_to_words(to_lowercase(get_file_text(filename1)))
+    words2 = text_to_words(to_lowercase(get_file_text(filename2)))
+    set1 = list_to_set(merge_sort(words1))
+    set2 = list_to_set(merge_sort(words2))
+    wordset = perform_operation(set1, set2, operation)
+    write_to_file(wordset)
