@@ -27,10 +27,12 @@ valid_keys = list(zip(*valid_kwargs))[0]
 
 def print_error(message):
     print("Error: {}".format(message))
+    if message == "not enough arguments":
+        print_help()
     exit(0)
 
 def print_help():
-    print('Call syntax: python3 setops.py set1=[filename];set2=[filename];operation=[difference|union|intersection]"')
+    print('Call syntax: python3 setops.py "set1=[filename];set2=[filename];operation=[difference|union|intersection]"')
     exit(0)
 
 # Splits a string into a list of substrings determined by the separator
@@ -146,11 +148,8 @@ def get_file_text(filename):
         return text
 
 def write_to_file(wordset):
-    output_filenames = list(filter(lambda f: f.startswith("output") and f.endswith(".txt"), listdir()))
-    output_numbers = list(map(lambda f: int(f[6:-4]), output_filenames))
-    next_number = 1 if not output_filenames else max(output_numbers) + 1
     text = combine(list(map(lambda word: word + "\n", wordset)))
-    with open("output{}.txt".format(next_number), "w") as output_file:
+    with open("output.txt", "w") as output_file:
         output_file.write(text[:-1])
 
 # ----------------------------------------- Set Operations -----------------------------------------
