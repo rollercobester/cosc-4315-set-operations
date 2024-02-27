@@ -46,6 +46,8 @@ const replace = (text, old, _new) => {
 
 const stripSpaces = (x) => replace(x, ' ', '');
 
+const combine = (x) => x ? x.reduce((a, b) => a + b, '') : '';
+
 const isLetter = (x) => (x >= 'a' && x <= 'z') || (x >= 'A' && x <= 'Z');
 
 const isNumber = (x) => x >= '0' && x <= '9';
@@ -158,14 +160,8 @@ const getFileText = (filename) => {
 };
 
 const writeToFile = (wordset) => {
-    const outputFilenames = fs.readdirSync('./').filter((f) => f.startsWith('output') && f.endsWith('.txt'));
-    const outputNumbers = outputFilenames.map((f) => parseInt(f.substring(6, f.length - 4), 10));
-    const nextNumber = outputNumbers.length === 0 ? 1 : Math.max(...outputNumbers) + 1;
-
-    const text = wordset.map((word) => word + '\n').join('');
-    const outputFilename = `output${nextNumber}.txt`;
-
-    fs.writeFileSync(outputFilename, text.substring(0, text.length - 1));
+    const text = combine(wordset.map((word) => word + '\n'));
+    fs.writeFileSync("output.txt", text.substring(0, text.length - 1));
 };
 // ----------------------------------------- Set Operations -----------------------------------------
 
