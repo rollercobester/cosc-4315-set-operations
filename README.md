@@ -43,4 +43,5 @@ To use the program, follow the instructions below:
     - Performs the specified set operation (`union`, `difference`, or `intersection`) on the sets of words.
 
 ## Resubmission Updates
-    - Changes output.txt to result.txt for python and javascript
+
+- Changes output.txt to result.txt for python and javascript
