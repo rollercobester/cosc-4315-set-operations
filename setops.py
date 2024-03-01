@@ -149,7 +149,7 @@ def get_file_text(filename):
 
 def write_to_file(wordset):
     text = combine(list(map(lambda word: word + "\n", wordset)))
-    with open("output.txt", "w") as output_file:
+    with open("result.txt", "w") as output_file:
         output_file.write(text[:-1])
 
 # ----------------------------------------- Set Operations -----------------------------------------

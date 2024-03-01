@@ -161,8 +161,9 @@ const getFileText = (filename) => {
 
 const writeToFile = (wordset) => {
     const text = combine(wordset.map((word) => word + '\n'));
-    fs.writeFileSync("output.txt", text.substring(0, text.length - 1));
+    fs.writeFileSync("result.txt", text.substring(0, text.length - 1));
 };
+
 // ----------------------------------------- Set Operations -----------------------------------------
 
 // Union set operation
