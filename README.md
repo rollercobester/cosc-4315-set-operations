@@ -1,5 +1,4 @@
-# cosc-4315-set-operations
-Homework 1 - Compute set operations on files with words and numbers
+# HW1: cosc-4315-set-operations
 Authors: Coby Walters and Jason Pedder
 
 This program performs set operations (union, difference, intersection) on two sets of words stored in text files. It accepts command-line arguments to specify the input files and the operation to perform.
