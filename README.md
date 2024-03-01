@@ -28,7 +28,7 @@ To use the program, follow the instructions below:
 ## File Format
 
 - Input text files should contain sets of words, each word separated by a newline character.
-- Output will be written to a text file named `output.txt`.
+- Output will be written to a text file named `result.txt`.
 
 ## Program Flow
 
@@ -42,3 +42,6 @@ To use the program, follow the instructions below:
 
 3. **Set Operations**:
     - Performs the specified set operation (`union`, `difference`, or `intersection`) on the sets of words.
+
+## Resubmission Updates
+    - Changes output.txt to result.txt for python and javascript
